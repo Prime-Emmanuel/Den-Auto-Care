@@ -56,6 +56,12 @@ export default function App() {
   const [bookingConf, setBookingConf] = useState('');
   const [selectedService, setSelectedService] = useState<typeof SERVICES[0] | null>(null);
   const [highlightedService, setHighlightedService] = useState<string | null>(null);
+  const [waModalData, setWaModalData] = useState<{ text: string } | null>(null);
+
+  const openWhatsApp = (number: string, text: string) => {
+    window.open(`https://wa.me/${number}?text=${text}`, '_blank');
+    setWaModalData(null);
+  };
 
   const [counters, setCounters] = useState({
     years: 0,
@@ -171,11 +177,11 @@ export default function App() {
       (m ? `\n\n📝 *Additional Notes:*\n_${m}_` : '')
     );
     
-    window.open(`https://wa.me/237692736822?text=${msg}`, '_blank');
+    setWaModalData({ text: msg });
     
-    setBookingConf('✓ Redirecting to WhatsApp — your booking details are pre-filled!');
+    setBookingConf('✓ Select a number to send your booking via WhatsApp!');
     e.currentTarget.reset();
-    setTimeout(() => setBookingConf(''), 5000);
+    setTimeout(() => setBookingConf(''), 6000);
   };
 
   const closeDrawer = () => {
@@ -219,7 +225,7 @@ export default function App() {
                   <p className="shop-desc">{p.desc}</p>
                   <div className="shop-bot">
                     <span className="shop-price">{p.price}</span>
-                    <a href={`https://wa.me/237692736822?text=I'm%20interested%20in%20buying%20${encodeURIComponent(p.name)}`} target="_blank" rel="noreferrer" className="btn-buy">
+                    <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: `I'm interested in buying ${p.name}` }); }} className="btn-buy">
                       <i className="fab fa-whatsapp"></i> Buy Now
                     </a>
                   </div>
@@ -243,7 +249,7 @@ export default function App() {
       )}
 
       {/* Floating Buttons */}
-      <a href="https://wa.me/237692736822?text=Hello%2C%20I%20need%20car%20assistance" target="_blank" rel="noreferrer" className="fab-wa" aria-label="WhatsApp">
+      <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: 'Hello, I need car assistance' }); }} className="fab-wa" aria-label="WhatsApp">
         <i className="fab fa-whatsapp"></i>
         <span className="fab-wa-tip">Need help?</span>
       </a>
@@ -328,7 +334,7 @@ export default function App() {
             <p className="hero-sub">Reliable automotive services in Douala Bonaberi — modern diagnostic tools, certified mechanics, precision you can trust.</p>
             <div className="hero-actions">
               <a href="#booking" className="btn btn-red"><i className="fas fa-calendar-check"></i> Book Appointment</a>
-              <a href="https://wa.me/237692736822?text=Hello%2C%20I%20need%20car%20assistance" target="_blank" rel="noreferrer" className="btn btn-outline"><i className="fab fa-whatsapp"></i> WhatsApp Us</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: 'Hello, I need car assistance' }); }} className="btn btn-outline"><i className="fab fa-whatsapp"></i> WhatsApp Us</a>
             </div>
             <div className="hero-stats">
               <div>
@@ -421,7 +427,7 @@ export default function App() {
                 <a href="tel:+237692736822" className="emg-phone" style={{ margin: 0 }}>+237 692 736 822</a>
                 <a href="tel:+237671116107" className="emg-phone" style={{ margin: 0 }}>+237 671 116 107</a>
               </div>
-              <a href="https://wa.me/237692736822?text=URGENT%3A%20I%20need%20immediate%20car%20assistance" target="_blank" rel="noreferrer" className="btn btn-red" style={{ width: '100%', justifyContent: 'center' }}>
+              <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: 'URGENT: I need immediate car assistance' }); }} className="btn btn-red" style={{ width: '100%', justifyContent: 'center' }}>
                 <i className="fab fa-whatsapp"></i> Request Emergency Service
               </a>
               <p style={{ fontSize: '.8rem', color: 'var(--muted)', marginTop: '12px', textAlign: 'center' }}>We'll arrive within 30–60 minutes</p>
@@ -567,7 +573,7 @@ export default function App() {
                   <p className="shop-desc">{p.desc}</p>
                   <div className="shop-bot">
                     <span className="shop-price">{p.price}</span>
-                    <a href={`https://wa.me/237692736822?text=I'm%20interested%20in%20buying%20${encodeURIComponent(p.name)}`} target="_blank" rel="noreferrer" className="btn-buy">
+                    <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: `I'm interested in buying ${p.name}` }); }} className="btn-buy">
                       <i className="fab fa-whatsapp"></i> Buy
                     </a>
                   </div>
@@ -648,7 +654,7 @@ export default function App() {
               <div className="ft-social">
                 <a href="#" className="ft-soc" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
                 <a href="#" className="ft-soc" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-                <a href="https://wa.me/237692736822" target="_blank" rel="noreferrer" className="ft-soc" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></a>
+                <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: 'Hello!' }); }} className="ft-soc" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></a>
               </div>
             </div>
             <div className="ft-col">
@@ -711,9 +717,31 @@ export default function App() {
                 <h4>Service Details & Requirements</h4>
                 <p>{selectedService.details}</p>
               </div>
-              <a href={`https://wa.me/237692736822?text=I'd%20like%20to%20book%20the%20${encodeURIComponent(selectedService.name)}%20service`} target="_blank" rel="noreferrer" className="btn btn-red" style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}>
+              <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: `I'd like to book the ${selectedService.name} service` }); }} className="btn btn-red" style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}>
                 Book This Service
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp Choose Number Modal */}
+      {waModalData && (
+        <div className="modal-overlay" style={{ zIndex: 9999 }} onClick={() => setWaModalData(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '360px', textAlign: 'center' }}>
+            <button className="modal-close" onClick={() => setWaModalData(null)}><i className="fas fa-times"></i></button>
+            <div className="modal-body" style={{ padding: '30px 20px' }}>
+              <div className="modal-ico" style={{ margin: '0 auto 16px', background: 'rgba(37,211,102,0.1)', color: '#25D366', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}><i className="fab fa-whatsapp"></i></div>
+              <h3>Contact Us</h3>
+              <p className="modal-desc" style={{ marginBottom: '24px' }}>Choose a WhatsApp number to continue:</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => openWhatsApp('237692736822', waModalData.text)}>
+                  <i className="fab fa-whatsapp"></i> +237 692 736 822
+                </button>
+                <button className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => openWhatsApp('237671116107', waModalData.text)}>
+                  <i className="fab fa-whatsapp"></i> +237 671 116 107
+                </button>
+              </div>
             </div>
           </div>
         </div>
