@@ -57,6 +57,7 @@ export default function App() {
   const [selectedService, setSelectedService] = useState<typeof SERVICES[0] | null>(null);
   const [highlightedService, setHighlightedService] = useState<string | null>(null);
   const [waModalData, setWaModalData] = useState<{ text: string } | null>(null);
+  const [isMaintenance, setIsMaintenance] = useState(true);
 
   const openWhatsApp = (number: string, text: string) => {
     window.open(`https://wa.me/${number}?text=${text}`, '_blank');
@@ -743,6 +744,19 @@ export default function App() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Maintenance Popup */}
+      {isMaintenance && (
+        <div className="maintenance-overlay">
+          <div className="maintenance-content">
+            <div className="maintenance-icon">
+              <i className="fas fa-tools"></i>
+            </div>
+            <h2>Under Maintenance</h2>
+            <p>We are currently performing scheduled maintenance to improve our services. Our website will be available again soon. Thank you for your patience!</p>
           </div>
         </div>
       )}

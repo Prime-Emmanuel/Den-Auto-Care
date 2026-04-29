@@ -594,3 +594,65 @@ h1, h2, h3, .display { font-family:'Helvetica Neue', Arial, sans-serif; font-wei
   .shop-name { font-size: 1.1rem; }
   .shop-price { font-size: 1.25rem; }
 }
+
+/* ── MAINTENANCE POPUP ─────────────────────────────── */
+.maintenance-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.maintenance-content {
+  background: var(--surface);
+  width: 100%;
+  max-width: 480px;
+  padding: 48px 32px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  animation: slideUp 0.5s ease-out;
+}
+.maintenance-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(211, 47, 47, 0.1);
+  color: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin: 0 auto 24px;
+}
+.maintenance-content h2 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.maintenance-content p {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .maintenance-content {
+    padding: 40px 24px;
+  }
+  .maintenance-content h2 {
+    font-size: 1.6rem;
+  }
+  .maintenance-content p {
+    font-size: 0.9rem;
+  }
+}
