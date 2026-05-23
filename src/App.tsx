@@ -57,7 +57,7 @@ export default function App() {
   const [selectedService, setSelectedService] = useState<typeof SERVICES[0] | null>(null);
   const [highlightedService, setHighlightedService] = useState<string | null>(null);
   const [waModalData, setWaModalData] = useState<{ text: string } | null>(null);
-  const [isMaintenance, setIsMaintenance] = useState(true);
+  const [isMaintenance, setIsMaintenance] = useState(false);
 
   const openWhatsApp = (number: string, text: string) => {
     window.open(`https://wa.me/${number}?text=${text}`, '_blank');
