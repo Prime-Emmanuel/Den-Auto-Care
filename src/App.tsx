@@ -425,8 +425,8 @@ export default function App() {
               <h3 style={{ color: 'var(--text)' }}>Emergency Hotline</h3>
               <p style={{ color: 'var(--muted)', marginBottom: 0 }}>Available 24 hours a day, 7 days a week</p>
               <div style={{ margin: '12px 0 22px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <a href="tel:+237692736822" className="emg-phone" style={{ margin: 0 }}>+237 692 736 822</a>
-                <a href="tel:+237671116107" className="emg-phone" style={{ margin: 0 }}>+237 671 116 107</a>
+                <a href="tel:+237657797736" className="emg-phone" style={{ margin: 0 }}>+237 6 57 79 77 36</a>
+                <a href="tel:+237671116107" className="emg-phone" style={{ margin: 0 }}>+237 6 71 11 61 07</a>
               </div>
               <a href="#" onClick={(e) => { e.preventDefault(); setWaModalData({ text: 'URGENT: I need immediate car assistance' }); }} className="btn btn-red" style={{ width: '100%', justifyContent: 'center' }}>
                 <i className="fab fa-whatsapp"></i> Request Emergency Service
@@ -736,11 +736,11 @@ export default function App() {
               <h3>Contact Us</h3>
               <p className="modal-desc" style={{ marginBottom: '24px' }}>Choose a WhatsApp number to continue:</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => openWhatsApp('237692736822', waModalData.text)}>
-                  <i className="fab fa-whatsapp"></i> +237 692 736 822
+                <button className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => openWhatsApp('237657797736', waModalData.text)}>
+                  <i className="fab fa-whatsapp"></i> +237 6 57 79 77 36
                 </button>
                 <button className="btn" style={{ width: '100%', justifyContent: 'center', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => openWhatsApp('237671116107', waModalData.text)}>
-                  <i className="fab fa-whatsapp"></i> +237 671 116 107
+                  <i className="fab fa-whatsapp"></i> +237 6 71 11 61 07
                 </button>
               </div>
             </div>
