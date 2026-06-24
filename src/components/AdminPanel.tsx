@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
+import { auth, db } from '../firebase';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
 
 interface AdminPanelProps {
   products: Product[];
@@ -7,16 +10,13 @@ interface AdminPanelProps {
 }
 
 export default function AdminPanel({ products, setProducts }: AdminPanelProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState('');
-
-  const [currentPassword, setCurrentPassword] = useState(() => {
-    return localStorage.getItem('autocare_admin_pwd') || 'autocare237';
-  });
-
-  const [newPassword, setNewPassword] = useState('');
-  const [pwdMsg, setPwdMsg] = useState('');
+  const [msg, setMsg] = useState('');
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -28,45 +28,81 @@ export default function AdminPanel({ products, setProducts }: AdminPanelProps) {
     desc: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoadingAuth(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === currentPassword) {
-      setIsAuthenticated(true);
+    try {
       setError('');
-    } else {
-      setError('Incorrect password');
+      await signInWithEmailAndPassword(auth, emailInput, passwordInput);
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
     }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword.trim().length < 4) {
-      setPwdMsg('Password too short.');
+  const handleResetPassword = async () => {
+    const emailToReset = emailInput || window.prompt('Please enter your admin email address to receive a password reset link:');
+    if (!emailToReset) {
+      setError('An email address is required to reset the password.');
       return;
     }
-    setCurrentPassword(newPassword);
-    localStorage.setItem('autocare_admin_pwd', newPassword);
-    setNewPassword('');
-    setPwdMsg('Password updated successfully!');
-    setTimeout(() => setPwdMsg(''), 3000);
-  };
-
-  const handleDelete = (index: number) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      const updated = [...products];
-      updated.splice(index, 1);
-      setProducts(updated);
+    try {
+      setError('');
+      setMsg('');
+      await sendPasswordResetEmail(auth, emailToReset);
+      setMsg(`Password reset email sent to ${emailToReset}! Check your inbox.`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to send reset email');
     }
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  const handleDelete = async (index: number) => {
+    const product = products[index];
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        if (product.id) {
+          await deleteDoc(doc(db, 'products', product.id));
+        }
+        const updated = [...products];
+        updated.splice(index, 1);
+        setProducts(updated);
+      } catch (err) {
+        alert('Error deleting product');
+      }
+    }
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProduct && editIndex !== null) {
-      const updated = [...products];
-      updated[editIndex] = editingProduct;
-      setProducts(updated);
-      setEditingProduct(null);
-      setEditIndex(null);
+      try {
+        if (editingProduct.id) {
+          const docRef = doc(db, 'products', editingProduct.id);
+          await updateDoc(docRef, {
+            name: editingProduct.name,
+            price: editingProduct.price,
+            image: editingProduct.image,
+            desc: editingProduct.desc
+          });
+        }
+        const updated = [...products];
+        updated[editIndex] = editingProduct;
+        setProducts(updated);
+        setEditingProduct(null);
+        setEditIndex(null);
+      } catch (err) {
+        alert('Error updating product');
+      }
     }
   };
 
@@ -86,13 +122,23 @@ export default function AdminPanel({ products, setProducts }: AdminPanelProps) {
     }
   };
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProducts([...products, newProduct]);
-    setNewProduct({ name: '', price: '', image: '', desc: '' });
+    try {
+      const docRef = await addDoc(collection(db, 'products'), newProduct);
+      const prodWithId = { ...newProduct, id: docRef.id };
+      setProducts([...products, prodWithId]);
+      setNewProduct({ name: '', price: '', image: '', desc: '' });
+    } catch (err) {
+      alert('Error adding product');
+    }
   };
 
-  if (!isAuthenticated) {
+  if (loadingAuth) {
+    return <div style={{ padding: '100px', textAlign: 'center' }}>Loading...</div>;
+  }
+
+  if (!user) {
     return (
       <div className="admin-login-page">
         <div className="admin-login-box">
@@ -100,15 +146,33 @@ export default function AdminPanel({ products, setProducts }: AdminPanelProps) {
           <h2>Admin Login</h2>
           <form onSubmit={handleLogin}>
             <input 
+              type="email" 
+              placeholder="Admin Email" 
+              value={emailInput} 
+              onChange={e => setEmailInput(e.target.value)} 
+              className="admin-input"
+              required 
+            />
+            <input 
               type="password" 
-              placeholder="Enter admin password" 
+              placeholder="Password" 
               value={passwordInput} 
               onChange={e => setPasswordInput(e.target.value)} 
               className="admin-input"
               required 
             />
             {error && <p className="admin-error">{error}</p>}
+            {msg && <p className="admin-msg">{msg}</p>}
             <button type="submit" className="btn btn-red w-full justify-center">Login</button>
+            <div style={{ marginTop: '16px' }}>
+              <button 
+                type="button"
+                onClick={handleResetPassword}
+                style={{ background: 'none', border: 'none', color: 'var(--accent)', textDecoration: 'underline', fontSize: '0.9rem', cursor: 'pointer' }}
+              >
+                Forgot Password?
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -119,23 +183,7 @@ export default function AdminPanel({ products, setProducts }: AdminPanelProps) {
     <div className="admin-dashboard">
       <div className="admin-header">
         <h2>Admin Dashboard</h2>
-        <button className="btn btn-outline" onClick={() => setIsAuthenticated(false)}>Logout</button>
-      </div>
-
-      <div className="admin-section">
-        <h3>Change Admin Password</h3>
-        <form onSubmit={handlePasswordChange} className="admin-pwd-form">
-          <input 
-            type="text" 
-            placeholder="New password" 
-            value={newPassword} 
-            onChange={e => setNewPassword(e.target.value)} 
-            className="admin-input"
-            required 
-          />
-          <button type="submit" className="btn btn-red">Update</button>
-        </form>
-        {pwdMsg && <p className="admin-msg">{pwdMsg}</p>}
+        <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
       </div>
 
       <div className="admin-section">

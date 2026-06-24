@@ -29,14 +29,27 @@ export default function App() {
   const [waModalData, setWaModalData] = useState<{ text: string } | null>(null);
   const [isMaintenance, setIsMaintenance] = useState(false);
 
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('autocare_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
 
   useEffect(() => {
-    localStorage.setItem('autocare_products', JSON.stringify(products));
-  }, [products]);
+    const fetchProducts = async () => {
+      try {
+        const { collection, getDocs } = await import('firebase/firestore');
+        const { db } = await import('./firebase');
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        if (!querySnapshot.empty) {
+          const prods: Product[] = [];
+          querySnapshot.forEach((doc) => {
+            prods.push({ id: doc.id, ...doc.data() } as Product);
+          });
+          setProducts(prods);
+        }
+      } catch (e) {
+        console.error("Error fetching products", e);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const openWhatsApp = (number: string, text: string) => {
     window.open(`https://wa.me/${number}?text=${text}`, '_blank');
