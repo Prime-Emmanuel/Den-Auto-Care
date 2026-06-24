@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Product, INITIAL_PRODUCTS } from './types';
+import AdminPanel from './components/AdminPanel';
 
 const SERVICES = [
   { icon:'fas fa-shield-alt',   name:'Anti-Rust Chassis Cleaning', desc:'Complete undercarriage rust removal and protective coating.', details: 'Your car might be rusting without you knowing! We offer professional chassis cleaning and anti-rust protection. Benefits include: longer vehicle life, reduced repair costs, and safer driving. Currently on PROMO starting from 35,000 FCFA.' },
@@ -12,43 +14,11 @@ const SERVICES = [
   { icon:'fas fa-cogs',         name:'Transmission',        desc:'Gearbox service, fluid change, and complete transmission diagnostics.', details: 'We service both automatic and manual transmissions. Services include fluid flushes, filter replacements, and clutch repairs. Necessary: Transmission issues can escalate quickly; bring it in at the first sign of slipping or rough shifting.' },
 ];
 
-const PRODUCTS = [
-  // Huile de Moteur
-  { name: 'CANADA PLUS OIL 20W-50', price: '3,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'DADO OIL (4 L)', price: '14,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'DADO OIL (1 L)', price: '3,500 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'CASTROL OIL 10w-40 (5 L)', price: '25,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'CASTROL OIL 5w-30 (5 L)', price: '30,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'CASTROL OIL 20w-50 (5 L)', price: '22,500 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'CASTROL OIL 15w-40 (5 L)', price: '20,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'TOYOTA 5w-30 (5 L)', price: '30,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Oil (Huile de Moteur)' },
-  { name: 'V8 ENGINE FLUSH PLUS', price: '5,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Engine Flush (Huile de Moteur)' },
-  { name: 'V8 OIL TREATMENT', price: '5,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Oil Treatment (Huile de Moteur)' },
-  
-  // Liquide de Frein
-  { name: 'ROYAL BREAK FLUID', price: '1,500 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Brake Fluid (Liquide de Frein)' },
-  
-  // Eau de Radiateur
-  { name: 'LIQUIDE DE REFROIDISSEMENT (5L)', price: '5,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Radiator Coolant (Eau de Radiateur)' },
-  
-  // L'Huile de Boite de Vitesses
-  { name: 'MACAT SAE 90', price: '2,500 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Gearbox Oil (Huile de Boite de Vitesses)' },
-  
-  // Huile de Crémaillère
-  { name: 'MACAT ATF TYPE-A', price: '2,500 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Power Steering Fluid (Huile de Crémaillère)' },
-  { name: 'ATOMATIC TRANSMISSION FLUID ATF III', price: '5,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'ATF Level III (Huile de Crémaillère)' },
-
-  // Batteries
-  { name: 'Loong Battery 95A', price: '65,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Car Battery' },
-  { name: 'Loong Battery 75A', price: '45,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Car Battery' },
-  { name: 'Supreme Battery 100A', price: '95,000 FRS', image: 'https://i.ibb.co/gbjr4w68/Chat-GPT-Image-Mar-14-2026-06-35-03-PM.png', desc: 'Car Battery' }
-];
-
 const marqueeNames = SERVICES.map(s => s.name);
 const allMarqueeItems = [...marqueeNames, ...marqueeNames, ...marqueeNames, ...marqueeNames];
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'shop'>('home');
+  const [view, setView] = useState<'home' | 'shop' | 'admin'>('home');
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [showScrollUp, setShowScrollUp] = useState(false);
@@ -58,6 +28,15 @@ export default function App() {
   const [highlightedService, setHighlightedService] = useState<string | null>(null);
   const [waModalData, setWaModalData] = useState<{ text: string } | null>(null);
   const [isMaintenance, setIsMaintenance] = useState(false);
+
+  const [products, setProducts] = useState<Product[]>(() => {
+    const saved = localStorage.getItem('autocare_products');
+    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('autocare_products', JSON.stringify(products));
+  }, [products]);
 
   const openWhatsApp = (number: string, text: string) => {
     window.open(`https://wa.me/${number}?text=${text}`, '_blank');
@@ -214,7 +193,7 @@ export default function App() {
           </div>
 
           <div className="shop-grid">
-            {PRODUCTS.map((p, i) => (
+            {products.map((p, i) => (
               <div key={i} className="shop-card">
                 <div className="shop-img-wrap">
                   <div className="shop-badge">In Stock</div>
@@ -274,6 +253,7 @@ export default function App() {
                 <li><a href="#booking">Booking</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li><a href="#admin" onClick={(e) => { e.preventDefault(); setView('admin'); }}>Admin</a></li>
               </>
             ) : (
               <>
@@ -302,6 +282,7 @@ export default function App() {
               <li><a href="#booking" className="dl" onClick={closeDrawer}>Booking</a></li>
               <li><a href="#about" className="dl" onClick={closeDrawer}>About</a></li>
               <li><a href="#contact" className="dl" onClick={closeDrawer}>Contact</a></li>
+              <li><a href="#admin" className="dl" onClick={(e) => { e.preventDefault(); setView('admin'); closeDrawer(); }}>Admin</a></li>
             </>
           ) : (
             <>
@@ -314,7 +295,9 @@ export default function App() {
         </a>
       </nav>
 
-      {view === 'shop' ? renderShopFull() : (
+      {view === 'admin' ? (
+        <AdminPanel products={products} setProducts={setProducts} />
+      ) : view === 'shop' ? renderShopFull() : (
         <>
           {/* Hero */}
       <section id="home">
@@ -562,7 +545,7 @@ export default function App() {
             <div className="bar" style={{ margin: '14px auto 0' }}></div>
           </div>
           <div className="shop-grid rv">
-            {PRODUCTS.slice(0, 8).map((p, i) => (
+            {products.slice(0, 8).map((p, i) => (
               <div key={i} className="shop-card">
                 <div className="shop-img-wrap">
                   <div className="shop-badge">In Stock</div>
